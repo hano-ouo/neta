@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ネタ解 — 日语文化语境AI 解析助手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F5F2EC;
+  --surface: #FDFCF9;
+  --ink: #1C1A16;
+  --ink-2: #5A5650;
+  --ink-3: #9B9690;
+  --accent: #C84B2F;
+  --accent-light: #F5E8E4;
+  --accent-mid: #E8A090;
+  --border: rgba(28,26,22,0.12);
+  --border-strong: rgba(28,26,22,0.22);
+  --purple: #4A3F7A;
+  --purple-light: #ECEAF5;
+  --teal: #1D6B5A;
+  --teal-light: #E3F0EC;
+  --amber: #8A5A1A;
+  --amber-light: #F5EDD8;
+  --serif: 'Noto Serif JP', 'Noto Serif SC', 'STSong', serif;
+  --sans: 'Noto Sans SC', 'Noto Sans JP', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --mono: 'DM Mono', 'SF Mono', 'Cascadia Code', monospace;
+  --r: 6px;
+  --r-lg: 12px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+header { position: sticky; top: 0; z-index: 100; background: rgba(245,242,236,0.88); backdrop-filter: blur(12px); border-bottom: 0.5px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.logo { display: flex; align-items: baseline; gap: 8px; }
+.logo-ja { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: 0.03em; }
+.logo-sub { font-size: 12px; color: var(--ink-3); letter-spacing: 0.05em; }
+.header-badge { font-size: 11px; font-family: var(--mono); padding: 3px 9px; border: 0.5px solid var(--border-strong); border-radius: 99px; color: var(--ink-2); }
+
+main { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+.hero { margin-bottom: 2.5rem; opacity: 0; transform: translateY(16px); animation: fadeUp 0.5s ease forwards; }
+.hero-title { font-family: var(--serif); font-size: 28px; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+.hero-title em { font-style: normal; color: var(--accent); }
+.hero-desc { font-size: 14px; color: var(--ink-2); line-height: 1.7; }
+.scope-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--border-strong); color: var(--ink-2); background: var(--surface); }
+.pill.on { background: var(--accent-light); border-color: var(--accent-mid); color: var(--accent); }
+.pill.off { text-decoration: line-through; opacity: 0.5; }
+
+.input-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--r-lg); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); opacity: 0; transform: translateY(16px); animation: fadeUp 0.5s ease 0.1s forwards; }
+.mode-tabs { display: flex; border-bottom: 0.5px solid var(--border); }
+.mode-tab { flex: 1; padding: 10px 16px; font-size: 13px; color: var(--ink-3); cursor: pointer; background: var(--bg); border: none; border-bottom: 2px solid transparent; font-family: var(--sans); transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.mode-tab:first-child { border-right: 0.5px solid var(--border); }
+.mode-tab.active { background: var(--surface); color: var(--ink); border-bottom-color: var(--accent); }
+.mode-tab svg { width: 14px; height: 14px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.input-header { padding: 12px 16px 0; display: flex; align-items: center; justify-content: space-between; }
+.input-label-text { font-size: 12px; color: var(--ink-3); letter-spacing: 0.04em; }
+.char-count { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.char-count.warn { color: var(--amber); }
+textarea { width: 100%; min-height: 110px; border: none; outline: none; padding: 10px 16px 12px; font-size: 15px; font-family: var(--sans); color: var(--ink); background: transparent; resize: none; line-height: 1.7; }
+textarea::placeholder { color: var(--ink-3); }
+/* 剪贴板按钮 */
+.clipboard-row { padding: 0 16px 10px; display: flex; justify-content: flex-end; }
+.clipboard-btn { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border: 0.5px solid var(--border-strong); border-radius: 99px; background: transparent; font-size: 11px; font-family: var(--sans); color: var(--ink-3); cursor: pointer; transition: all 0.15s; }
+.clipboard-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+.clipboard-btn svg { width: 12px; height: 12px; }
+.clipboard-btn.success { border-color: #6BBF9A; color: var(--teal); background: var(--teal-light); }
+
+.image-panel { padding: 16px; }
+.drop-zone { border: 1.5px dashed var(--border-strong); border-radius: var(--r); padding: 2rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; background: var(--bg); }
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--accent-mid); background: var(--accent-light); }
+.drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.drop-icon { margin-bottom: 8px; color: var(--ink-3); }
+.drop-icon svg { width: 28px; height: 28px; }
+.drop-text { font-size: 14px; color: var(--ink-2); }
+.drop-hint { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+.img-preview-wrap { display: none; position: relative; border-radius: var(--r); overflow: hidden; background: var(--bg); border: 0.5px solid var(--border-strong); }
+.img-preview-wrap.visible { display: block; }
+.img-preview { width: 100%; max-height: 240px; object-fit: contain; display: block; }
+.img-remove { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(28,26,22,0.7); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; transition: background 0.15s; }
+.img-remove:hover { background: rgba(200,75,47,0.9); }
+.img-remove svg { width: 14px; height: 14px; }
+.img-meta { padding: 8px 12px; font-size: 12px; font-family: var(--mono); color: var(--ink-3); border-top: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.upload-progress { display: none; padding: 10px 16px; font-size: 12px; color: var(--ink-3); font-family: var(--mono); align-items: center; gap: 8px; }
+.upload-progress.visible { display: flex; }
+.progress-bar-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar { height: 100%; background: var(--accent); border-radius: 99px; width: 0%; transition: width 0.3s; }
+.input-footer { border-top: 0.5px solid var(--border); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.input-note { font-size: 12px; color: var(--ink-3); flex: 1; }
+.input-note span { margin: 0 4px; opacity: 0.5; }
+.btn-submit { display: flex; align-items: center; gap: 7px; padding: 8px 18px; background: var(--ink); color: #FFF; border: none; border-radius: var(--r); font-size: 13px; font-family: var(--sans); font-weight: 500; cursor: pointer; transition: background 0.15s, transform 0.1s; white-space: nowrap; }
+.btn-submit:hover { background: #2C2A24; }
+.btn-submit:active { transform: scale(0.97); }
+.btn-submit:disabled { background: var(--ink-3); cursor: not-allowed; transform: none; }
+.btn-submit svg { width: 14px; height: 14px; transition: transform 0.2s; }
+.btn-submit:not(:disabled):hover svg { transform: rotate(15deg); }
+.val-hint { font-size: 12px; color: var(--accent); padding: 0 16px 10px; display: none; }
+.val-hint.visible { display: block; }
+
+.api-config { margin-top: 10px; padding: 10px 14px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(8px); animation: fadeUp 0.5s ease 0.2s forwards; }
+.api-config label { font-size: 12px; color: var(--ink-3); white-space: nowrap; font-family: var(--mono); }
+.api-config input { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; font-family: var(--mono); color: var(--ink); min-width: 0; }
+.api-config input::placeholder { color: var(--ink-3); }
+.api-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; transition: background 0.2s; }
+.api-dot.live { background: #2E9B6E; }
+
+.error-card { background: var(--accent-light); border: 0.5px solid var(--accent-mid); border-radius: var(--r); padding: 12px 16px; font-size: 13px; color: var(--accent); margin-top: 1.25rem; display: none; }
+.error-card.visible { display: block; }
+
+/* SKELETON */
+.skeleton-wrap { display: none; margin-top: 2rem; }
+.skeleton-wrap.visible { display: block; }
+
+.skeleton-banner {
+  height: 64px; border-radius: 0 var(--r) var(--r) 0;
+  border-left: 3px solid var(--accent-mid);
+  background: var(--surface); border-top: 0.5px solid var(--border); border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border);
+  margin-bottom: 1.25rem;
+  overflow: hidden; position: relative;
+}
+
+.skeleton-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.skeleton-card-header { padding: 16px 18px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.skeleton-card-body { padding: 14px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.skel {
+  background: linear-gradient(90deg, var(--bg) 25%, rgba(28,26,22,0.06) 50%, var(--bg) 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 1.4s ease infinite;
+}
+.skel-title { height: 22px; width: 120px; }
+.skel-badge { height: 18px; width: 60px; border-radius: 99px; }
+.skel-line { height: 13px; width: 100%; }
+.skel-line.w80 { width: 80%; }
+.skel-line.w60 { width: 60%; }
+.skel-line.short { height: 11px; width: 50%; margin-bottom: 6px; }
+.skel-block { display: flex; flex-direction: column; gap: 6px; }
+.skel-block.full { grid-column: 1/-1; }
+
+/* STEP INDICATOR inside skeleton */
+.skeleton-steps { padding: 16px 0 8px; display: flex; flex-direction: column; gap: 8px; }
+.skeleton-step { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-3); transition: color 0.3s; font-family: var(--mono); }
+.skeleton-step.active { color: var(--ink-2); }
+.skeleton-step.done { color: var(--teal); }
+.sk-dot { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; flex-shrink: 0; position: relative; }
+.skeleton-step.active .sk-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1.5px solid currentColor; opacity: 0.3; animation: pulse 1s ease infinite; }
+.skeleton-step.done .sk-dot { background: currentColor; border-color: currentColor; }
+
+/* RESULTS */
+.results-wrap { display: none; margin-top: 2rem; }
+.results-wrap.visible { display: block; }
+.context-banner { background: var(--surface); border: 0.5px solid var(--border-strong); border-left: 3px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 12px 16px; margin-bottom: 1.25rem; font-size: 14px; color: var(--ink-2); line-height: 1.65; opacity: 0; animation: fadeUp 0.4s ease forwards; }
+.context-banner strong { color: var(--accent); font-weight: 500; display: block; font-size: 12px; letter-spacing: 0.05em; margin-bottom: 4px; }
+.term-card { background: var(--surface); border: 0.5px solid var(--border-strong); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 12px; opacity: 0; transform: translateY(12px); }
+.term-card.visible { animation: fadeUp 0.4s ease forwards; }
+.term-card-header { padding: 14px 18px 12px; border-bottom: 0.5px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.term-word { font-family: var(--serif); font-size: 22px; font-weight: 600; letter-spacing: 0.04em; }
+.term-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.conf { font-size: 11px; font-family: var(--mono); padding: 2px 8px; border-radius: 99px; }
+.conf.high { background: var(--teal-light); color: var(--teal); }
+.conf.medium { background: var(--amber-light); color: var(--amber); }
+.conf.low { background: var(--accent-light); color: var(--accent); }
+.source-tags { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.src-tag { font-size: 11px; padding: 2px 7px; border-radius: 99px; background: var(--bg); border: 0.5px solid var(--border-strong); color: var(--ink-3); }
+.dim-row { padding: 10px 18px; border-bottom: 0.5px solid var(--border); display: flex; gap: 7px; flex-wrap: wrap; }
+.dim-chip { font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--border); color: var(--ink-3); background: transparent; }
+.dim-chip.active { background: var(--purple-light); border-color: #8A7FC0; color: var(--purple); font-weight: 500; }
+.term-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.term-field { padding: 14px 18px; border-bottom: 0.5px solid var(--border); border-right: 0.5px solid var(--border); }
+.term-field:nth-child(2n) { border-right: none; }
+.term-field.full { grid-column: 1 / -1; border-right: none; }
+.term-field:last-child, .term-field:nth-last-child(2):not(.full) { border-bottom: none; }
+.term-field.full:last-child { border-bottom: none; }
+.field-key { font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; margin-bottom: 5px; text-transform: uppercase; }
+.field-val { font-size: 13px; color: var(--ink); line-height: 1.6; }
+.similar-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+.similar-pill { font-size: 12px; padding: 3px 10px; border-radius: 99px; background: var(--bg); border: 0.5px solid var(--border-strong); color: var(--ink-2); }
+.no-neta-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r-lg); padding: 2.5rem; text-align: center; opacity: 0; animation: fadeUp 0.4s ease forwards; }
+.no-neta-icon { font-size: 28px; margin-bottom: 12px; opacity: 0.4; }
+.no-neta-title { font-family: var(--serif); font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.no-neta-desc { font-size: 13px; color: var(--ink-2); line-height: 1.7; max-width: 360px; margin: 0 auto; }
+
+/* FEEDBACK */
+.feedback-bar { display: none; margin-top: 1.25rem; padding: 12px 16px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); align-items: center; gap: 12px; flex-wrap: wrap; }
+.feedback-bar.visible { display: flex; }
+.feedback-label { font-size: 12px; color: var(--ink-3); }
+.feedback-btns { display: flex; gap: 6px; }
+.fb-btn { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border: 0.5px solid var(--border-strong); border-radius: 99px; background: transparent; font-size: 12px; font-family: var(--sans); color: var(--ink-2); cursor: pointer; transition: all 0.15s; }
+.fb-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+.fb-btn.selected { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+.fb-btn svg { width: 13px; height: 13px; }
+.fb-btn.positive:hover, .fb-btn.positive.selected { border-color: #6BBF9A; color: var(--teal); background: var(--teal-light); }
+.feedback-form { display: none; margin-top: 10px; width: 100%; }
+.feedback-form.visible { display: block; }
+.feedback-form-inner { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--r); padding: 12px 14px; }
+.feedback-type-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.fb-type-btn { font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--ink-2); cursor: pointer; font-family: var(--sans); transition: all 0.15s; }
+.fb-type-btn:hover { border-color: var(--accent-mid); color: var(--accent); }
+.fb-type-btn.selected { background: var(--accent-light); border-color: var(--accent-mid); color: var(--accent); }
+.feedback-textarea { width: 100%; min-height: 64px; border: 0.5px solid var(--border); border-radius: var(--r); padding: 8px 10px; font-size: 13px; font-family: var(--sans); color: var(--ink); background: var(--surface); resize: none; outline: none; line-height: 1.6; margin-bottom: 10px; }
+.feedback-textarea::placeholder { color: var(--ink-3); }
+.feedback-form-footer { display: flex; justify-content: flex-end; gap: 8px; }
+.fb-cancel { padding: 6px 14px; border: 0.5px solid var(--border-strong); border-radius: var(--r); background: transparent; font-size: 12px; font-family: var(--sans); color: var(--ink-2); cursor: pointer; }
+.fb-send { padding: 6px 14px; border: none; border-radius: var(--r); background: var(--ink); font-size: 12px; font-family: var(--sans); color: #fff; cursor: pointer; transition: background 0.15s; }
+.fb-send:hover { background: #2C2A24; }
+.fb-send:disabled { background: var(--ink-3); cursor: not-allowed; }
+.fb-status { font-size: 12px; color: var(--teal); display: none; margin-top: 6px; }
+.fb-status.visible { display: block; }
+.fb-status.error { color: var(--accent); }
+
+/* EXAMPLES */
+.examples-section { margin-top: 2.5rem; opacity: 0; animation: fadeUp 0.5s ease 0.3s forwards; }
+.examples-label { font-size: 12px; color: var(--ink-3); letter-spacing: 0.06em; margin-bottom: 10px; }
+.examples-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+.example-btn { font-size: 13px; font-family: var(--serif); padding: 6px 13px; border: 0.5px solid var(--border-strong); border-radius: var(--r); background: var(--surface); color: var(--ink-2); cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em; }
+.example-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
+footer { border-top: 0.5px solid var(--border); margin-top: 5rem; padding-top: 1.5rem; font-size: 12px; color: var(--ink-3); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1C1A16;
+    --surface: #24211C;
+    --ink: #E8E4DD;
+    --ink-2: #B5B0A7;
+    --ink-3: #7A7570;
+    --accent: #E8735A;
+    --accent-light: #3D2018;
+    --accent-mid: #A0503C;
+    --border: rgba(232,228,221,0.1);
+    --border-strong: rgba(232,228,221,0.18);
+    --purple: #9B8FD4;
+    --purple-light: #2A2540;
+    --teal: #5FBF9F;
+    --teal-light: #1A3028;
+    --amber: #D4A94A;
+    --amber-light: #302818;
+  }
+  .btn-submit { color: #1C1A16; background: var(--ink); }
+  .btn-submit:hover { background: #D4CFC8; }
+  .fb-send { color: #1C1A16; background: var(--ink); }
+  .fb-send:hover { background: #D4CFC8; }
+}
+
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.6); opacity: 0; } }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+@media (max-width: 600px) {
+  main { padding: 2rem 1rem 4rem; }
+  .term-fields { grid-template-columns: 1fr; }
+  .term-field { border-right: none; }
+  .term-field:nth-last-child(2):not(.full) { border-bottom: 0.5px solid var(--border); }
+  .hero-title { font-size: 22px; }
+  .input-note { display: none; }
+  .skeleton-card-body { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <span class="logo-ja">ネタ解</span>
+    <span class="logo-sub">日语文化语境AI 解析助手</span>
+  </div>
+  <span class="header-badge">Beta v0.7</span>
+</header>
+<main>
+  <div class="hero">
+    <h1 class="hero-title">看懂梗，<em>才算真的看懂</em></h1>
+    <p class="hero-desc">输入你在二次元、日综、SNS 里遇到的日文文本或截图，AI 识别其中的文化梗并用接地气的中文解释语境、语气和笑点。</p>
+    <div class="scope-pills">
+      <span class="pill on">✓ 文化梗识别</span>
+      <span class="pill on">✓ 截图 / 图片</span>
+      <!--<span class="pill on">✓ 伏字分析</span>-->
+      <span class="pill on">✓ 语境还原</span>
+      <span class="pill off">✗ 语法解释</span>
+      <span class="pill off">✗ 全文翻译</span>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tabText" onclick="switchMode('text')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        输入文字
+      </button>
+      <button class="mode-tab" id="tabImage" onclick="switchMode('image')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        上传截图
+      </button>
+    </div>
+    <div class="panel active" id="panelText">
+      <div class="input-header">
+        <span class="input-label-text">粘贴日文文本</span>
+        <span class="char-count" id="charCount">0 / 500</span>
+      </div>
+      <textarea id="userInput" maxlength="500" enterkeyhint="send" placeholder="貼り付けてください — 例：フライングゲットしたぜ！／それな、まじでありえない"></textarea>
+      <div class="clipboard-row">
+        <button class="clipboard-btn" id="clipboardBtn" onclick="readClipboard()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          从剪贴板读取
+        </button>
+      </div>
+    </div>
+    <div class="panel" id="panelImage">
+      <div class="image-panel">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handleFile(this.files[0])">
+          <div class="drop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+          <div class="drop-text">点击选择或拖拽图片到此处</div>
+          <div class="drop-hint">支持截图、照片 · JPG / PNG / WebP · 最大 4 MB</div>
+        </div>
+        <div class="upload-progress" id="uploadProgress">
+          <span id="uploadProgressText">上传中…</span>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+        </div>
+        <div class="img-preview-wrap" id="imgPreviewWrap">
+          <img class="img-preview" id="imgPreview" alt="预览">
+          <button class="img-remove" onclick="removeImage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <div class="img-meta"><span id="imgMetaName"></span><span id="imgMetaSize"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="val-hint" id="valHint"></div>
+    <div class="input-footer">
+      <span class="input-note">适合 N5 水平以上 <span>·</span> Enter 提交 <span>·</span> Shift+Enter 换行</span>
+      <button class="btn-submit" id="submitBtn" onclick="analyze()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        解梗
+      </button>
+    </div>
+  </div>
+
+  <div class="api-config">
+    <div class="api-dot" id="apiDot"></div>
+    <label>Dify API Key</label>
+    <input type="password" id="apiKey" placeholder="app-xxxxxxxxxxxxxxxxxxxx" oninput="handleApiKeyInput()">
+  </div>
+
+  <div class="error-card" id="errorCard"></div>
+
+  <div class="skeleton-wrap" id="skeletonWrap">
+    <div class="skeleton-steps" id="skeletonSteps">
+      <div class="skeleton-step" id="sskStep1"><div class="sk-dot"></div><span id="sskStep1text">正在识别文本中的文化梗…</span></div>
+      <div class="skeleton-step" id="sskStep2"><div class="sk-dot"></div><span>检索梗词知识库…</span></div>
+      <div class="skeleton-step" id="sskStep3"><div class="sk-dot"></div><span>生成接地气的解释…</span></div>
+    </div>
+    <div class="skeleton-banner skel" id="skelBanner" style="display:none"></div>
+    <div id="skelCards"></div>
+  </div>
+
+  <div class="results-wrap" id="resultsWrap"></div>
+
+  <div class="feedback-bar" id="feedbackBar">
+    <span class="feedback-label">结果是否准确？</span>
+    <div class="feedback-btns">
+      <button class="fb-btn positive" id="fbThumbUp" onclick="handleFeedback('positive')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        准确
+      </button>
+      <button class="fb-btn" id="fbThumbDown" onclick="handleFeedback('negative')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        有误
+      </button>
+    </div>
+    <div class="feedback-form" id="feedbackForm">
+      <div class="feedback-form-inner">
+        <div class="feedback-type-row">
+          <button class="fb-type-btn" onclick="toggleFbType(this,'误识别为梗')">误识别为梗</button>
+          <button class="fb-type-btn" onclick="toggleFbType(this,'漏识别梗')">漏识别梗</button>
+          <button class="fb-type-btn" onclick="toggleFbType(this,'来源错误')">来源错误</button>
+          <button class="fb-type-btn" onclick="toggleFbType(this,'解释偏差')">解释偏差</button>
+          <button class="fb-type-btn" onclick="toggleFbType(this,'其他')">其他</button>
+        </div>
+        <textarea class="feedback-textarea" id="feedbackNote" placeholder="补充说明（选填）…" rows="2"></textarea>
+        <div class="feedback-form-footer">
+          <button class="fb-cancel" onclick="cancelFeedback()">取消</button>
+          <button class="fb-send" id="fbSendBtn" onclick="submitFeedback()">提交反馈</button>
+        </div>
+        <div class="fb-status" id="fbStatus"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="examples-section">
+    <div class="examples-label">试试这些例子（文字模式）</div>
+    <div class="examples-grid">
+      <!--<button class="example-btn" onclick="fillExample('フライングゲットしたぜ！今日発売なのに昨日もう手に入れた')">フライングゲット</button>-->
+      <button class="example-btn" onclick="fillExample('それな、まじでありえない')">それな</button>
+      <button class="example-btn" onclick="fillExample('なんでやねん！そんなわけあるか')">なんでやねん</button>
+      <button class="example-btn" onclick="fillExample('推しが尊すぎて無理、ガチ恋勢になりそう')">推し / ガチ恋</button>
+      <button class="example-btn" onclick="fillExample('わかりみが深すぎる、エモい')">わかりみ / エモい</button>
+      <button class="example-btn" onclick="fillExample('草、これはひどい')">草</button>
+    </div>
+  </div>
+
+  <footer>
+    <span>ネタ解 — 日语文化语境AI 解析助手</span>
+    <span>Powered by Dify · GPT-4o mini · GPT-4o</span>
+  </footer>
+</main>
+
+<script>
+const DIFY_BASE = 'https://api.dify.ai/v1';
+const MAX_FILE_BYTES = 4 * 1024 * 1024;
+const MAX_CHARS = 500;
+const FEEDBACK_API = '';
+
+let apiKey = localStorage.getItem('neta_api_key') || '';
+let currentMode = 'text';
+let uploadedFileId = null;
+let previewObjectUrl = null;
+let lastInput = '';
+let lastResult = null;
+let selectedFbType = '';
+let isComposing = false;
+
+const apiKeyInput = document.getElementById('apiKey');
+const apiDot = document.getElementById('apiDot');
+const textarea = document.getElementById('userInput');
+const charCount = document.getElementById('charCount');
+const submitBtn = document.getElementById('submitBtn');
+const skeletonWrap = document.getElementById('skeletonWrap');
+const resultsWrap = document.getElementById('resultsWrap');
+const errorCard = document.getElementById('errorCard');
+const valHint = document.getElementById('valHint');
+const dropZone = document.getElementById('dropZone');
+const feedbackBar = document.getElementById('feedbackBar');
+
+if (apiKey) { apiKeyInput.value = apiKey; apiDot.classList.add('live'); }
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (currentMode === 'text') textarea.focus();
+});
+
+function handleApiKeyInput() {
+  apiKey = apiKeyInput.value.trim();
+  localStorage.setItem('neta_api_key', apiKey);
+  apiDot.classList.toggle('live', apiKey.length > 10);
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('tabText').classList.toggle('active', mode === 'text');
+  document.getElementById('tabImage').classList.toggle('active', mode === 'image');
+  document.getElementById('panelText').classList.toggle('active', mode === 'text');
+  document.getElementById('panelImage').classList.toggle('active', mode === 'image');
+  hideValHint();
+  if (mode === 'text') textarea.focus();
+}
+
+textarea.addEventListener('input', () => {
+  const n = textarea.value.length;
+  charCount.textContent = `${n} / ${MAX_CHARS}`;
+  charCount.classList.toggle('warn', n >= MAX_CHARS * 0.9);
+});
+
+textarea.addEventListener('compositionstart', () => { isComposing = true; });
+textarea.addEventListener('compositionend', () => { isComposing = false; });
+
+textarea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+    e.preventDefault();
+    analyze();
+  }
+});
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+
+async function handleFile(file) {
+  if (!file) return;
+  hideValHint(); hideError();
+  if (!file.type.startsWith('image/')) { showValHint('请上传图片文件（JPG / PNG / WebP）'); return; }
+  if (file.size > MAX_FILE_BYTES) { showValHint(`图片太大（${(file.size/1024/1024).toFixed(1)} MB），请压缩到 4 MB 以内`); return; }
+  if (!apiKey) { showValHint('请先填入 Dify API Key，再上传图片'); return; }
+  if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+  previewObjectUrl = URL.createObjectURL(file);
+  document.getElementById('imgPreview').src = previewObjectUrl;
+  document.getElementById('imgMetaName').textContent = file.name;
+  const sizeStr = file.size > 1024*1024 ? `${(file.size/1024/1024).toFixed(1)} MB` : `${Math.round(file.size/1024)} KB`;
+  document.getElementById('imgMetaSize').textContent = sizeStr;
+  document.getElementById('imgPreviewWrap').classList.add('visible');
+  dropZone.style.display = 'none';
+  uploadedFileId = null;
+  showUploadProgress(0);
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('user', 'neta-kai-user');
+    let fp = 0;
+    const pt = setInterval(() => { fp = Math.min(fp + 15, 85); showUploadProgress(fp); }, 200);
+    const res = await fetch(`${DIFY_BASE}/files/upload`, { method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}` }, body: formData });
+    clearInterval(pt);
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.message || `上传失败 HTTP ${res.status}`); }
+    const data = await res.json();
+    uploadedFileId = data.id;
+    showUploadProgress(100);
+    setTimeout(() => hideUploadProgress(), 600);
+  } catch(e) { hideUploadProgress(); removeImage(); showValHint(`图片上传失败：${e.message}`); }
+}
+
+function showUploadProgress(pct) {
+  document.getElementById('uploadProgress').classList.add('visible');
+  document.getElementById('progressBar').style.width = `${pct}%`;
+  document.getElementById('uploadProgressText').textContent = pct < 100 ? `上传中… ${pct}%` : '上传完成';
+}
+function hideUploadProgress() { document.getElementById('uploadProgress').classList.remove('visible'); }
+function removeImage() {
+  uploadedFileId = null;
+  if (previewObjectUrl) { URL.revokeObjectURL(previewObjectUrl); previewObjectUrl = null; }
+  document.getElementById('imgPreviewWrap').classList.remove('visible');
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('fileInput').value = '';
+  dropZone.style.display = '';
+  hideValHint(); hideUploadProgress();
+}
+
+function showValHint(msg) { valHint.textContent = msg; valHint.classList.add('visible'); }
+function hideValHint() { valHint.classList.remove('visible'); }
+function showError(msg) { errorCard.textContent = msg; errorCard.classList.add('visible'); }
+function hideError() { errorCard.classList.remove('visible'); }
+function fillExample(text) { switchMode('text'); textarea.value = text; charCount.textContent = `${text.length} / ${MAX_CHARS}`; textarea.focus(); hideValHint(); }
+
+async function readClipboard() {
+  const btn = document.getElementById('clipboardBtn');
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) {
+      showValHint('剪贴板中没有文本内容');
+      return;
+    }
+    textarea.value = text;
+    charCount.textContent = `${text.length} / ${MAX_CHARS}`;
+    charCount.classList.toggle('warn', text.length >= MAX_CHARS * 0.9);
+    hideValHint();
+    btn.classList.add('success');
+    setTimeout(() => btn.classList.remove('success'), 1200);
+  } catch (err) {
+    showValHint('无法读取剪贴板，请手动粘贴（Ctrl+V）');
+  }
+}
+
+function setSkelStep(n) {
+  ['sskStep1','sskStep2','sskStep3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'skeleton-step';
+    if (i + 1 < n) el.classList.add('done');
+    else if (i + 1 === n) el.classList.add('active');
+  });
+}
+
+function showSkeleton(numCards) {
+  skeletonWrap.classList.add('visible');
+  document.getElementById('skelBanner').style.display = 'none';
+  document.getElementById('skelCards').innerHTML = '';
+}
+
+function revealSkeletonCards(numCards) {
+  document.getElementById('skelBanner').style.display = 'block';
+  const skelCards = document.getElementById('skelCards');
+  skelCards.innerHTML = '';
+  for (let i = 0; i < numCards; i++) {
+    skelCards.innerHTML += `
+      <div class="skeleton-card" style="opacity:0;transform:translateY(10px);transition:opacity 0.3s ${i*0.1}s, transform 0.3s ${i*0.1}s">
+        <div class="skeleton-card-header"><div class="skel skel-title"></div><div class="skel skel-badge"></div></div>
+        <div class="skeleton-card-body">
+          <div class="skel-block full"><div class="skel skel-line short"></div><div class="skel skel-line"></div><div class="skel skel-line w80"></div></div>
+          <div class="skel-block"><div class="skel skel-line short"></div><div class="skel skel-line w80"></div></div>
+          <div class="skel-block"><div class="skel skel-line short"></div><div class="skel skel-line w60"></div></div>
+          <div class="skel-block full"><div class="skel skel-line short"></div><div class="skel skel-line"></div></div>
+        </div>
+      </div>`;
+  }
+  requestAnimationFrame(() => {
+    skelCards.querySelectorAll('.skeleton-card').forEach(c => {
+      c.style.opacity = '1'; c.style.transform = 'translateY(0)';
+    });
+  });
+}
+
+function hideSkeleton() {
+  skeletonWrap.classList.remove('visible');
+  document.getElementById('skelCards').innerHTML = '';
+  document.getElementById('skelBanner').style.display = 'none';
+}
+
+async function analyze() {
+  hideValHint(); hideError();
+  if (!validate()) return;
+  if (!apiKey) { showError('请先填入 Dify API Key（格式：app-xxx…）'); return; }
+
+  resultsWrap.classList.remove('visible');
+  resultsWrap.innerHTML = '';
+  feedbackBar.classList.remove('visible');
+  resetFeedbackForm();
+  lastResult = null;
+
+  submitBtn.disabled = true;
+  showSkeleton(2);
+  document.getElementById('sskStep1text').textContent = currentMode === 'image' ? '正在读取图片中的日文…' : '正在识别文本中的文化梗…';
+  setSkelStep(1);
+
+  lastInput = currentMode === 'text' ? textarea.value.trim() : '[图片输入]';
+
+  const inputs = {};
+  if (currentMode === 'text') {
+    inputs.user_input = textarea.value.trim();
+  } else {
+    inputs.user_input = '';
+    inputs.image = { transfer_method: 'local_file', upload_file_id: uploadedFileId, type: 'image' };
+  }
+
+  const t2 = setTimeout(() => { setSkelStep(2); revealSkeletonCards(2); }, 2500);
+  const t3 = setTimeout(() => setSkelStep(3), 5000);
+
+  try {
+    const res = await fetch(`${DIFY_BASE}/workflows/run`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs, response_mode: 'blocking', user: 'neta-kai-user' })
+    });
+
+    clearTimeout(t2); clearTimeout(t3);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Dify 返回 HTTP ${res.status}`);
+    }
+
+    const json = await res.json();
+    const outputs = json.data?.outputs || json.outputs || {};
+    const rawText = outputs.result || outputs.text || outputs.output || JSON.stringify(outputs);
+
+    let parsed;
+    try {
+      const cleaned = rawText.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(cleaned);
+    } catch {
+      const match = rawText.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('返回格式解析失败，请确认 End 节点输出变量名为 result');
+    }
+
+    if (parsed.error === 'no_input') {
+      hideSkeleton();
+      showValHint('请输入文本或上传图片');
+      return;
+    }
+
+    lastResult = parsed;
+
+    const numResults = parsed.is_neta ? (parsed.explanations || []).length : 0;
+    if (numResults > 0) revealSkeletonCards(numResults);
+    setSkelStep(3);
+
+    await new Promise(r => setTimeout(r, 400));
+    hideSkeleton();
+    renderResults(parsed);
+    feedbackBar.classList.add('visible');
+    resultsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (e) {
+    clearTimeout(t2); clearTimeout(t3);
+    hideSkeleton();
+    showError(`出错了：${e.message}`);
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+function validate() {
+  if (currentMode === 'text') {
+    if (!textarea.value.trim()) { showValHint('请输入日文文本再提交'); return false; }
+    return true;
+  }
+  if (currentMode === 'image') {
+    if (!uploadedFileId) {
+      showValHint(document.getElementById('imgPreviewWrap').classList.contains('visible') ? '图片还在上传中，请稍候' : '请选择或拖拽一张截图');
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
+function escHtml(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function tagLabel(t) { return ({anime:'アニメ',manga:'マンガ',drama:'ドラマ',movie:'映画',variety_show:'バラエティ',sns:'SNS',idol_fandom:'アイドル',game:'ゲーム',music:'音楽',ad_cm:'CM',net_slang:'ネットスラング',comedian:'お笑い',censored:'伏字',other:'その他'})[t]||t; }
+function dimLabel(d) { return ({reference:'引用 reference',style:'風格 style',pragmatic:'語用 pragmatic'})[d]||d; }
+function confLabel(c) { return ({high:'高可信度',medium:'中等可信度',low:'低可信度'})[(c||'').toLowerCase()]||c; }
+
+function renderResults(data) {
+  resultsWrap.innerHTML = '';
+  resultsWrap.classList.add('visible');
+  if (!data.is_neta) {
+    resultsWrap.innerHTML = `<div class="no-neta-card"><div class="no-neta-icon">⛩</div><div class="no-neta-title">未发现文化梗</div><div class="no-neta-desc">${escHtml(data.message||'这段文字里没有发现文化梗，是比较日常的表达。如果某个词让你困惑，可以把那个词单独发给我，也许它本身就是个梗～')}</div></div>`;
+    return;
+  }
+  if (data.context_meaning) {
+    const b = document.createElement('div');
+    b.className = 'context-banner';
+    b.innerHTML = `<strong>整句语境</strong>${escHtml(data.context_meaning)}`;
+    resultsWrap.appendChild(b);
+  }
+  (data.explanations||[]).forEach((item,idx) => {
+    const card = document.createElement('div');
+    card.className = 'term-card';
+    card.style.animationDelay = `${idx*0.08}s`;
+    const srcTags = (item.source_tags||[]).map(t=>`<span class="src-tag">${escHtml(tagLabel(t))}</span>`).join('');
+    const dims = ['reference','style','pragmatic'].map(d=>{const on=item.dimensions&&item.dimensions[d];return `<span class="dim-chip ${on?'active':''}">${escHtml(dimLabel(d))}</span>`;}).join('');
+    const conf = ((item.confidence_display||'medium')).toLowerCase();
+    const similarHtml = (()=>{ const raw=item.similar_cn||''; const parts=raw.split(/[""「」\/,，、]/).map(s=>s.trim()).filter(Boolean); if(!parts.length) return `<div class="field-val">${escHtml(raw)}</div>`; return `<div class="similar-pills">${parts.map(p=>`<span class="similar-pill">${escHtml(p)}</span>`).join('')}</div>`; })();
+    card.innerHTML = `
+      <div class="term-card-header"><div class="term-word">${escHtml(item.term)}</div><div class="term-meta"><span class="conf ${conf}">${escHtml(confLabel(item.confidence_display||'medium'))}</span><div class="source-tags">${srcTags}</div></div></div>
+      <div class="dim-row">${dims}</div>
+      <div class="term-fields">
+        <div class="term-field full"><div class="field-key">这个梗是什么</div><div class="field-val">${escHtml(item.explanation||'')}</div></div>
+        <div class="term-field"><div class="field-key">语气 / 氛围</div><div class="field-val">${escHtml(item.nuance||'')}</div></div>
+        <div class="term-field"><div class="field-key">典型场景</div><div class="field-val">${escHtml(item.usage_scene||'')}</div></div>
+        <div class="term-field full"><div class="field-key">为什么有共鸣</div><div class="field-val">${escHtml(item.why_resonates||item.why_funny||'')}</div></div>
+        <div class="term-field full"><div class="field-key">类似中文表达</div>${similarHtml}</div>
+      </div>`;
+    resultsWrap.appendChild(card);
+    requestAnimationFrame(()=>card.classList.add('visible'));
+  });
+}
+
+function handleFeedback(type) {
+  const up = document.getElementById('fbThumbUp');
+  const down = document.getElementById('fbThumbDown');
+  const form = document.getElementById('feedbackForm');
+  if (type === 'positive') {
+    up.classList.add('selected'); down.classList.remove('selected');
+    form.classList.remove('visible');
+    submitToNotion('positive','','');
+  } else {
+    down.classList.add('selected'); up.classList.remove('selected');
+    form.classList.add('visible');
+  }
+}
+function toggleFbType(btn, type) { document.querySelectorAll('.fb-type-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); selectedFbType=type; }
+function cancelFeedback() { document.getElementById('feedbackForm').classList.remove('visible'); document.getElementById('fbThumbDown').classList.remove('selected'); document.getElementById('feedbackNote').value=''; document.querySelectorAll('.fb-type-btn').forEach(b=>b.classList.remove('selected')); selectedFbType=''; hideFbStatus(); }
+function resetFeedbackForm() { document.getElementById('feedbackForm').classList.remove('visible'); document.getElementById('fbThumbUp').classList.remove('selected'); document.getElementById('fbThumbDown').classList.remove('selected'); document.getElementById('feedbackNote').value=''; document.querySelectorAll('.fb-type-btn').forEach(b=>b.classList.remove('selected')); selectedFbType=''; hideFbStatus(); }
+async function submitFeedback() {
+  const note = document.getElementById('feedbackNote').value.trim();
+  const btn = document.getElementById('fbSendBtn');
+  btn.disabled=true; btn.textContent='提交中…';
+  const ok = await submitToNotion('negative', selectedFbType||'其他', note);
+  btn.disabled=false; btn.textContent='提交反馈';
+  if (ok) { showFbStatus('✓ 反馈已收到，感谢！',false); setTimeout(()=>{cancelFeedback();hideFbStatus();},2000); }
+  else showFbStatus('提交失败，请稍后重试',true);
+}
+function showFbStatus(msg,isErr) { const el=document.getElementById('fbStatus'); el.textContent=msg; el.className='fb-status visible'+(isErr?' error':''); }
+function hideFbStatus() { document.getElementById('fbStatus').className='fb-status'; }
+async function submitToNotion(feedbackType, errorType, note) {
+  // 如果没有配置后端 API，直接返回成功（保留反馈 UI 的完整交互）
+  if (!FEEDBACK_API) {
+    console.log('反馈内容：', { input: lastInput, feedbackType, errorType, note });
+    return true;
+  }
+  try {
+    const res = await fetch(FEEDBACK_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: lastInput, feedbackType, errorType, note, result: lastResult ? JSON.stringify(lastResult,null,2) : '' })
+    });
+    return res.ok;
+  } catch { return false; }
+}
+</script>
+</body>
+</html>
