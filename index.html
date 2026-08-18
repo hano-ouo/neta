@@ -64,7 +64,6 @@ main { max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
 .char-count.warn { color: var(--amber); }
 textarea { width: 100%; min-height: 110px; border: none; outline: none; padding: 10px 16px 12px; font-size: 15px; font-family: var(--sans); color: var(--ink); background: transparent; resize: none; line-height: 1.7; }
 textarea::placeholder { color: var(--ink-3); }
-/* 剪贴板按钮 */
 .clipboard-row { padding: 0 16px 10px; display: flex; justify-content: flex-end; }
 .clipboard-btn { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border: 0.5px solid var(--border-strong); border-radius: 99px; background: transparent; font-size: 11px; font-family: var(--sans); color: var(--ink-3); cursor: pointer; transition: all 0.15s; }
 .clipboard-btn:hover { border-color: var(--accent-mid); color: var(--accent); background: var(--accent-light); }
@@ -112,7 +111,6 @@ textarea::placeholder { color: var(--ink-3); }
 .error-card { background: var(--accent-light); border: 0.5px solid var(--accent-mid); border-radius: var(--r); padding: 12px 16px; font-size: 13px; color: var(--accent); margin-top: 1.25rem; display: none; }
 .error-card.visible { display: block; }
 
-/* SKELETON */
 .skeleton-wrap { display: none; margin-top: 2rem; }
 .skeleton-wrap.visible { display: block; }
 
@@ -150,7 +148,6 @@ textarea::placeholder { color: var(--ink-3); }
 .skel-block { display: flex; flex-direction: column; gap: 6px; }
 .skel-block.full { grid-column: 1/-1; }
 
-/* STEP INDICATOR inside skeleton */
 .skeleton-steps { padding: 16px 0 8px; display: flex; flex-direction: column; gap: 8px; }
 .skeleton-step { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-3); transition: color 0.3s; font-family: var(--mono); }
 .skeleton-step.active { color: var(--ink-2); }
@@ -159,7 +156,6 @@ textarea::placeholder { color: var(--ink-3); }
 .skeleton-step.active .sk-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1.5px solid currentColor; opacity: 0.3; animation: pulse 1s ease infinite; }
 .skeleton-step.done .sk-dot { background: currentColor; border-color: currentColor; }
 
-/* RESULTS */
 .results-wrap { display: none; margin-top: 2rem; }
 .results-wrap.visible { display: block; }
 .context-banner { background: var(--surface); border: 0.5px solid var(--border-strong); border-left: 3px solid var(--accent); border-radius: 0 var(--r) var(--r) 0; padding: 12px 16px; margin-bottom: 1.25rem; font-size: 14px; color: var(--ink-2); line-height: 1.65; opacity: 0; animation: fadeUp 0.4s ease forwards; }
@@ -193,7 +189,6 @@ textarea::placeholder { color: var(--ink-3); }
 .no-neta-title { font-family: var(--serif); font-size: 16px; font-weight: 600; margin-bottom: 6px; }
 .no-neta-desc { font-size: 13px; color: var(--ink-2); line-height: 1.7; max-width: 360px; margin: 0 auto; }
 
-/* FEEDBACK */
 .feedback-bar { display: none; margin-top: 1.25rem; padding: 12px 16px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--r); align-items: center; gap: 12px; flex-wrap: wrap; }
 .feedback-bar.visible { display: flex; }
 .feedback-label { font-size: 12px; color: var(--ink-3); }
@@ -221,7 +216,6 @@ textarea::placeholder { color: var(--ink-3); }
 .fb-status.visible { display: block; }
 .fb-status.error { color: var(--accent); }
 
-/* EXAMPLES */
 .examples-section { margin-top: 2.5rem; opacity: 0; animation: fadeUp 0.5s ease 0.3s forwards; }
 .examples-label { font-size: 12px; color: var(--ink-3); letter-spacing: 0.06em; margin-bottom: 10px; }
 .examples-grid { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -277,7 +271,7 @@ footer { border-top: 0.5px solid var(--border); margin-top: 5rem; padding-top: 1
     <span class="logo-ja">ネタ解</span>
     <span class="logo-sub">日语文化语境AI 解析助手</span>
   </div>
-  <span class="header-badge">Beta v0.7</span>
+  <span class="header-badge">Beta v0.8</span>
 </header>
 <main>
   <div class="hero">
@@ -286,7 +280,6 @@ footer { border-top: 0.5px solid var(--border); margin-top: 5rem; padding-top: 1
     <div class="scope-pills">
       <span class="pill on">✓ 文化梗识别</span>
       <span class="pill on">✓ 截图 / 图片</span>
-      <!--<span class="pill on">✓ 伏字分析</span>-->
       <span class="pill on">✓ 语境还原</span>
       <span class="pill off">✗ 语法解释</span>
       <span class="pill off">✗ 全文翻译</span>
@@ -349,7 +342,7 @@ footer { border-top: 0.5px solid var(--border); margin-top: 5rem; padding-top: 1
   <div class="api-config">
     <div class="api-dot" id="apiDot"></div>
     <label>Dify API Key</label>
-    <input type="password" id="apiKey" placeholder="app-xxxxxxxxxxxxxxxxxxxx" oninput="handleApiKeyInput()">
+    <input type="password" id="apiKey" placeholder="可选：填入 API Key 使用完整功能" oninput="handleApiKeyInput()">
   </div>
 
   <div class="error-card" id="errorCard"></div>
@@ -398,9 +391,8 @@ footer { border-top: 0.5px solid var(--border); margin-top: 5rem; padding-top: 1
   </div>
 
   <div class="examples-section">
-    <div class="examples-label">试试这些例子（文字模式）</div>
+    <div class="examples-label">试试这些例子（文字模式 · 无需 API Key）</div>
     <div class="examples-grid">
-      <!--<button class="example-btn" onclick="fillExample('フライングゲットしたぜ！今日発売なのに昨日もう手に入れた')">フライングゲット</button>-->
       <button class="example-btn" onclick="fillExample('それな、まじでありえない')">それな</button>
       <button class="example-btn" onclick="fillExample('なんでやねん！そんなわけあるか')">なんでやねん</button>
       <button class="example-btn" onclick="fillExample('推しが尊すぎて無理、ガチ恋勢になりそう')">推し / ガチ恋</button>
@@ -420,6 +412,127 @@ const DIFY_BASE = 'https://api.dify.ai/v1';
 const MAX_FILE_BYTES = 4 * 1024 * 1024;
 const MAX_CHARS = 500;
 const FEEDBACK_API = '';
+
+const DEMO_DATA = {
+  'それな、まじでありえない': {
+    is_neta: true,
+    context_meaning: "「それな」表示强烈赞同，「まじでありえない」加强这种不可思议的感觉。整句在表达：'对对对！这也太离谱了吧'的语气。",
+    explanations: [
+      {
+        term: "それな",
+        explanation: "「それな」是「それはそうだな」的极度省略形，表示对对方发言的强烈赞同，相当于中文的'就是说啊''+1'。2010年代后半在Twitter上爆发性普及，现在已成为年轻人口语中的日常表达。",
+        nuance: "轻松随意的共鸣感，带一点'我懂你'的亲密语气，朋友之间聊天时最常用",
+        usage_scene: "推文评论区、LINE群聊、朋友对话中表达认同时",
+        similar_cn: "「就是说啊」「+1」「我懂」「确实确实」",
+        why_resonates: "把原本有点冗长的同意表达压缩成三个音，节奏感极佳，说出来的瞬间就有种'我们是一伙的'的归属感",
+        confidence_display: "high",
+        source_tags: ["sns", "net_slang"],
+        dimensions: { reference: false, style: false, pragmatic: true }
+      },
+      {
+        term: "まじでありえない",
+        explanation: "「まじで」的口语强调形式 +「ありえない」（不可能/无法接受），用来表达强烈的不敢相信或无法接受的情绪。",
+        nuance: "夸张的惊讶或不满，语气比字面意思更情绪化",
+        usage_scene: "听到令人震惊的消息或遇到离谱的事情时",
+        similar_cn: "「这也太离谱了」「真的假的」「不可能吧」",
+        why_resonates: "用最极端的词表达最日常的惊讶，这种情绪落差本身就是笑点",
+        confidence_display: "high",
+        source_tags: ["sns", "net_slang"],
+        dimensions: { reference: false, style: false, pragmatic: true }
+      }
+    ]
+  },
+  'なんでやねん！そんなわけあるか': {
+    is_neta: true,
+    context_meaning: "关西腔的经典吐槽句式，前半句是大阪漫才的定番ツッコミ，后半句加强否定语气。整句相当于中文的'你开什么玩笑！怎么可能有那种事！'",
+    explanations: [
+      {
+        term: "なんでやねん",
+        explanation: "关西方言的经典吐槽语，直译是'为什么啊'，但实际功能是ツッコミ（吐槽）的定番句式。在漫才和综艺中被无数次使用，已成为日本全国都懂的关西腔符号。",
+        nuance: "力道十足的吐槽，带着'你在胡说什么'的无奈和好笑",
+        usage_scene: "朋友说了离谱的话时、综艺里艺人被装傻时",
+        similar_cn: "「你咋回事」「什么鬼」「开什么玩笑」",
+        why_resonates: "关西腔自带喜剧DNA，「なんでやねん」四个音一出来，日本人瞬间进入搞笑模式",
+        confidence_display: "high",
+        source_tags: ["comedian", "variety_show"],
+        dimensions: { reference: true, style: true, pragmatic: true }
+      }
+    ]
+  },
+  '推しが尊すぎて無理、ガチ恋勢になりそう': {
+    is_neta: true,
+    context_meaning: "粉丝在感叹自己的推太完美了，完全招架不住，甚至开始担心自己会越界爱上对方——语气是又甜蜜又崩溃的那种自我吐槽",
+    explanations: [
+      {
+        term: "推しが尊すぎて無理",
+        explanation: "「尊い」原意是'神圣、珍贵'，被饭圈借用来形容推让人觉得完美得不像真实存在；「無理」这里不是'不行'而是'我撑不住了'。合起来就是：我推美好到我承受不了。",
+        nuance: "极度溺爱又带点夸张崩溃的撒娇感",
+        usage_scene: "看到偶像生图、舞台截图时的第一反应",
+        similar_cn: "「我真的要窒息了」「他凭什么这么好」「我不行了救命」",
+        why_resonates: "「尊い」把宗教感和饭圈溺爱感焊死在一起，「無理」把情绪推到崩溃边缘",
+        confidence_display: "medium",
+        source_tags: ["sns", "net_slang", "idol_fandom"],
+        dimensions: { reference: false, style: false, pragmatic: true }
+      },
+      {
+        term: "ガチ恋勢になりそう",
+        explanation: "「ガチ恋」指粉丝真情实感爱上偶像，「勢」表示'这一派/这类人'。整句在自我警告：我好像要从普通粉丝滑向真爱粉了。",
+        nuance: "半开玩笑地承认自己陷得太深",
+        usage_scene: "推展现温柔或私下真实一面之后",
+        similar_cn: "「我好像真的喜欢他了」「理智粉线快守不住了」",
+        why_resonates: "饭圈有'应援和恋爱要分开'的潜规则，承认快越线需要勇气",
+        confidence_display: "medium",
+        source_tags: ["sns", "net_slang", "idol_fandom"],
+        dimensions: { reference: false, style: false, pragmatic: true }
+      }
+    ]
+  },
+  'わかりみが深すぎる、エモい': {
+    is_neta: true,
+    context_meaning: "两层情感叠加：先是对对方发言的深度认同（わかりみ），然后是这种认同感带来的情绪触动（エモい）。",
+    explanations: [
+      {
+        term: "わかりみ",
+        explanation: "「わかる」的名词化变形，表示'我太理解了''深有同感'。2010年代后期开始在SNS上流行，比「それな」更多一层情绪投入。",
+        nuance: "深度共情，不是简单的同意而是'你说的就是我'",
+        usage_scene: "看到戳中内心的推文或发言时",
+        similar_cn: "「太懂了」「世另我」",
+        why_resonates: "把动词名词化的语法变形本身就很有网络感，一出来就知道是'圈内人'",
+        confidence_display: "high",
+        source_tags: ["sns", "net_slang"],
+        dimensions: { reference: false, style: true, pragmatic: true }
+      },
+      {
+        term: "エモい",
+        explanation: "来自英语emotional的和製英语，指某种难以言说但深深触动内心的情感体验，多用于怀旧、感动、怅然若失等复杂情绪。",
+        nuance: "不是简单的'感动'，而是那种胸口一紧、说不清道不明的情绪",
+        usage_scene: "看到青春回忆、黄昏照片、毕业视频时",
+        similar_cn: "「好哭」「破防了」「泪目」",
+        why_resonates: "日语里原本没有一个词能精准表达这种情绪，「エモい」填上了这个空",
+        confidence_display: "medium",
+        source_tags: ["sns", "net_slang"],
+        dimensions: { reference: false, style: true, pragmatic: true }
+      }
+    ]
+  },
+  '草、これはひどい': {
+    is_neta: true,
+    context_meaning: "先笑为敬（草），然后补一句'这也太惨了'，笑中带同情，是日本网络最经典的回应模式之一",
+    explanations: [
+      {
+        term: "草",
+        explanation: "日本网络用语的'笑'。源自2ch掲示板时代用'w'表示笑い，多个w连起来像草丛，后来直接用汉字'草'代替。",
+        nuance: "轻松随意的笑，有时带一点'无语了笑死'的无奈感",
+        usage_scene: "看到好笑又有点惨的内容时",
+        similar_cn: "「笑死」「233」「哈哈哈」",
+        why_resonates: "一个汉字承载了整个网络时代的笑文化，极致的省略美学",
+        confidence_display: "high",
+        source_tags: ["net_slang", "sns"],
+        dimensions: { reference: false, style: true, pragmatic: true }
+      }
+    ]
+  }
+};
 
 let apiKey = localStorage.getItem('neta_api_key') || '';
 let currentMode = 'text';
@@ -489,7 +602,7 @@ async function handleFile(file) {
   hideValHint(); hideError();
   if (!file.type.startsWith('image/')) { showValHint('请上传图片文件（JPG / PNG / WebP）'); return; }
   if (file.size > MAX_FILE_BYTES) { showValHint(`图片太大（${(file.size/1024/1024).toFixed(1)} MB），请压缩到 4 MB 以内`); return; }
-  if (!apiKey) { showValHint('请先填入 Dify API Key，再上传图片'); return; }
+  if (!apiKey) { showValHint('演示模式不支持图片，请填入 Dify API Key 后使用图片功能'); return; }
   if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
   previewObjectUrl = URL.createObjectURL(file);
   document.getElementById('imgPreview').src = previewObjectUrl;
@@ -601,10 +714,40 @@ function hideSkeleton() {
   document.getElementById('skelBanner').style.display = 'none';
 }
 
+function showDemoResult(data, inputText) {
+  resultsWrap.classList.remove('visible');
+  resultsWrap.innerHTML = '';
+  feedbackBar.classList.remove('visible');
+
+  lastInput = inputText;
+  lastResult = data;
+
+  showSkeleton(2);
+  setSkelStep(1);
+  setTimeout(() => { setSkelStep(2); revealSkeletonCards(data.explanations?.length || 0); }, 600);
+  setTimeout(() => { setSkelStep(3); }, 1000);
+
+  setTimeout(() => {
+    hideSkeleton();
+    renderResults(data);
+    resultsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 1400);
+}
+
 async function analyze() {
   hideValHint(); hideError();
   if (!validate()) return;
-  if (!apiKey) { showError('请先填入 Dify API Key（格式：app-xxx…）'); return; }
+
+  // 演示模式：没有 API Key 时，检查是否有匹配的 Demo 数据
+  if (!apiKey) {
+    const demoInput = currentMode === 'text' ? textarea.value.trim() : '';
+    if (demoInput && DEMO_DATA[demoInput]) {
+      showDemoResult(DEMO_DATA[demoInput], demoInput);
+      return;
+    }
+    showError('演示模式：请输入上方示例中的文本（或填入 Dify API Key 使用完整功能）');
+    return;
+  }
 
   resultsWrap.classList.remove('visible');
   resultsWrap.innerHTML = '';
@@ -769,7 +912,6 @@ async function submitFeedback() {
 function showFbStatus(msg,isErr) { const el=document.getElementById('fbStatus'); el.textContent=msg; el.className='fb-status visible'+(isErr?' error':''); }
 function hideFbStatus() { document.getElementById('fbStatus').className='fb-status'; }
 async function submitToNotion(feedbackType, errorType, note) {
-  // 如果没有配置后端 API，直接返回成功（保留反馈 UI 的完整交互）
   if (!FEEDBACK_API) {
     console.log('反馈内容：', { input: lastInput, feedbackType, errorType, note });
     return true;
